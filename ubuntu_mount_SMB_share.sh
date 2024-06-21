@@ -42,7 +42,7 @@ else
     sudo apt-get install -y linux-modules-extra-$(uname -r)
 
     # Check if installation was successful
-    if [ $? -eq 0 ]; Then
+    if [ $? -eq 0 ]; then
         echo_yellow "linux-modules-extra installed successfully."
     else
         echo
