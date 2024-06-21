@@ -5,11 +5,6 @@ echo_yellow() {
     echo -e "\e[93m$1\e[0m"
 }
 
-# Function to echo text in red color
-echo_red() {
-    echo -e "\e[91m$1\e[0m"
-}
-
 # Function to check if the ping was successful
 check_ping() {
     if ping -c 4 "$1" &> /dev/null; then
@@ -47,19 +42,20 @@ else
     sudo apt-get install -y linux-modules-extra-$(uname -r)
 
     # Check if installation was successful
-    if [ $? -eq 0 ]; then
+    if [ $? -eq 0 ]; Then
         echo_yellow "linux-modules-extra installed successfully."
     else
         echo
-        echo_red "Failed to install linux-modules-extra. Would you want to change the locale to Chinese? (y/n)"
-        read answer
+        echo_yellow "Failed to install linux-modules-extra. Would you want to change the locale to Chinese? (y/n)"
+        read -e -p "[y/n]: " answer  # Use read -e for echoing the input
         if [ "$answer" = "y" ]; then
             sudo localectl set-locale LANG=zh_TW.UTF-8
-            echo_green "Locale changed to Chinese."
+            echo_yellow "Locale changed to Chinese."
         else
             echo_yellow "Locale remains unchanged."
         fi
     fi
+
 fi
 
 
