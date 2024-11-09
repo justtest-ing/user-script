@@ -26,7 +26,7 @@ sudo chmod 666 /var/run/docker.sock
 sudo usermod -aG docker $USER
 
 # Download and execute the Dockge installation script
-wget -O install-dockge.sh install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/heads/main/install-dockge.sh
+wget -O install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/heads/main/install-dockge.sh
 sudo chmod +x install-dockge.sh
 sudo ./install-dockge.sh
 
