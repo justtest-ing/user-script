@@ -30,6 +30,9 @@ wget -O install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/h
 sudo chmod +x install-dockge.sh
 sudo ./install-dockge.sh
 
+# Start the Docker Compose services using the absolute path to the compose file
+docker compose -f /mnt/appdata/dockge/docker-compose.yaml up -d
+
 # Download and execute the user script to mount an SMB share
 wget -O https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/ubuntu_mount_SMB_share.sh
 sudo chmod +x ubuntu_mount_SMB_share.sh
@@ -41,4 +44,4 @@ sudo rm install-dockge.sh
 sudo rm ubuntu_mount_SMB_share.sh
 
 echo "Script execution completed."
-echo "It is best to reboot and start dockge in /mnt/appdata/dockge/"
+echo "If you see error with the script starting dockge, It is best to reboot and start dockge in /mnt/appdata/dockge/"
