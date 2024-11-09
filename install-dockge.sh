@@ -1,6 +1,6 @@
 # Define the directory and file path for the docker-compose.yaml
 TARGET_DIR="/mnt/appdata/dockge"
-COMPOSE_FILE="$TARGET_DIR/docker-compose.yaml"
+COMPOSE_FILE="$TARGET_DIR/compose.yaml"
 
 # Create the directory if it doesn't exist
 sudo mkdir -p "$TARGET_DIR"
