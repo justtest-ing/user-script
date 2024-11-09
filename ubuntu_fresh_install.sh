@@ -31,7 +31,7 @@ sudo chmod +x install-dockge.sh
 sudo ./install-dockge.sh
 
 # Start the Docker Compose services using the absolute path to the compose file
-docker compose -f /mnt/appdata/dockge/docker-compose.yaml up -d
+docker compose -f /mnt/appdata/dockge/compose.yaml up -d
 
 # Download and execute the user script to mount an SMB share
 wget -O https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/ubuntu_mount_SMB_share.sh
