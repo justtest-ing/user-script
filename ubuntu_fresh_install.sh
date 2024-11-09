@@ -26,7 +26,7 @@ sudo chmod 666 /var/run/docker.sock
 sudo usermod -aG docker $USER
 
 # Download and execute the Dockge installation script
-wget -O install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/heads/main/install-dockge.sh
+wget -O install-dockge.sh install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/heads/main/install-dockge.sh
 sudo chmod +x install-dockge.sh
 sudo ./install-dockge.sh
 
@@ -34,7 +34,7 @@ sudo ./install-dockge.sh
 docker compose -f /mnt/appdata/dockge/compose.yaml up -d
 
 # Download and execute the user script to mount an SMB share
-wget -O https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/ubuntu_mount_SMB_share.sh
+wget -O ubuntu_mount_SMB_share.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/ubuntu_mount_SMB_share.sh
 sudo chmod +x ubuntu_mount_SMB_share.sh
 sudo ./ubuntu_mount_SMB_share.sh
 
