@@ -3,6 +3,13 @@
 # Ensure we have necessary tools
 sudo apt-get update && sudo apt-get install -y zsh curl git
 
+# Set up custom .zhsrc if desired
+echo "Would you like to set up a custom .zhsrc configuration? (y/n) "
+read setup_config
+if [[ $setup_config == "y" ]]; then
+    curl -o ~/.zhsrc https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh.zhsrc.example
+fi
+
 # Install ZSH
 echo "Installing ZSH..."
 sudo apt install zsh
@@ -10,13 +17,6 @@ sudo apt install zsh
 # Set ZSH as default shell
 echo "Setting ZSH as default shell..."
 chsh -s $(which zsh)
-
-# Set up custom .zhsrc if desired
-echo "Would you like to set up a custom .zhsrc configuration? (y/n) "
-read setup_config
-if [[ $setup_config == "y" ]]; then
-    curl -o ~/.zhsrc https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh.zhsrc.example
-fi
 
 # Install Oh My Zsh with retry logic
 function install_ohmyzsh() {
