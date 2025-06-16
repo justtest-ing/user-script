@@ -48,10 +48,21 @@ else
   echo "Skipping SMB share setup."
 fi
 
+# Ask if they want to install zsh
+read -p "Do you want to install zsh? (y/n): " zsh_response
+if [ "$zsh_response" == "y" ] || [ "$zsh_response" == "Y" ]; then
+  # Download and execute the zsh installation script
+  wget -O install-zsh.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh.sh
+  sudo chmod +x install-zsh.sh
+  sudo ./install-zsh.sh
+  echo "Zsh installed. You may want to run zsh or reboot to switch shell."
+fi
+
 # Clean up downloaded scripts
 sudo rm -f install-docker.sh >/dev/null 2>&1
 sudo rm -f install-dockge.sh >/dev/null 2>&1
 sudo rm -f ubuntu_mount_SMB_share.sh >/dev/null 2>&1
+sudo rm -f install-zsh.sh >/dev/null 2>&1
 
 echo "Script execution completed."
 echo "If you see error with the script starting dockge, It is best to reboot and start dockge in /mnt/appdata/dockge/"
