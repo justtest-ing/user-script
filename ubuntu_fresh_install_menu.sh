@@ -72,14 +72,13 @@ function install_zsh {
         wget -O install-zsh-sudo.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh-sudo.sh
         sudo chmod +x install-zsh-sudo.sh
         sudo ./install-zsh-sudo.sh "$CURRENT_USER"
-        echo "Zsh installed. You may want to reboot to switch shell."
     fi
 }
 
 # Main script execution
 while true; do
     show_menu
-    read -p "Please select an option (1-6) or press q to quit: " choice
+    read -p "Please select an option (1-7) or press q to quit: " choice
     
     case $choice in
         1)
