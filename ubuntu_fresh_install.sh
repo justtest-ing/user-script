@@ -25,23 +25,33 @@ sudo ./install-docker.sh
 sudo chmod 666 /var/run/docker.sock
 sudo usermod -aG docker $USER
 
-# Download and execute the Dockge installation script
-wget -O install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/heads/main/install-dockge.sh
-sudo chmod +x install-dockge.sh
-sudo ./install-dockge.sh
+# Ask if they want to install Dockge and its services
+read -p "Do you want to install Dockge? (y/n): " dockge_response
+if [ "$dockge_response" == "y" ] || [ "$dockge_response" == "Y" ]; then
+  # Download and execute the Dockge installation script
+  wget -O install-dockge.sh https://github.com/justtest-ing/user-script/raw/refs/heads/main/install-dockge.sh
+  sudo chmod +x install-dockge.sh
+  sudo ./install-dockge.sh
+  
+  # Start the Docker Compose services for Dockge
+  docker compose -f /mnt/appdata/dockge/compose.yaml up -d
+fi
 
-# Start the Docker Compose services using the absolute path to the compose file
-docker compose -f /mnt/appdata/dockge/compose.yaml up -d
-
-# Download and execute the user script to mount an SMB share
-wget -O ubuntu_mount_SMB_share.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/ubuntu_mount_SMB_share.sh
-sudo chmod +x ubuntu_mount_SMB_share.sh
-sudo ./ubuntu_mount_SMB_share.sh
+# Ask user if they want to mount an SMB share
+read -p "Do you want to set up an SMB share mount? (y/n): " smb_response
+if [ "$smb_response" == "y" ] || [ "$smb_response" == "Y" ]; then
+  # Download and execute the user script to mount an SMB share
+  wget -O ubuntu_mount_SMB_share.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/ubuntu_mount_SMB_share.sh
+  sudo chmod +x ubuntu_mount_SMB_share.sh
+  sudo ./ubuntu_mount_SMB_share.sh
+else
+  echo "Skipping SMB share setup."
+fi
 
 # Clean up downloaded scripts
-sudo rm install-docker.sh
-sudo rm install-dockge.sh
-sudo rm ubuntu_mount_SMB_share.sh
+sudo rm -f install-docker.sh >/dev/null 2>&1
+sudo rm -f install-dockge.sh >/dev/null 2>&1
+sudo rm -f ubuntu_mount_SMB_share.sh >/dev/null 2>&1
 
 echo "Script execution completed."
 echo "If you see error with the script starting dockge, It is best to reboot and start dockge in /mnt/appdata/dockge/"
