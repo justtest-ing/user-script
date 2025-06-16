@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# Check if the script is being run as root
+# Detect the current user (not root)
+CURRENT_USER=$(logname)
+
+# Check if script is being run without sudo
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run this script as root"
-  exit 1
+    echo "This script must be run as root or with sudo privileges."
+    echo "Please try running it again with sudo:"
+    echo "\nsudo $0 $*"
+    exit 1
 fi
 
 # Ask user if they want to change the timezone to Asia/Taipei
@@ -52,9 +57,9 @@ fi
 read -p "Do you want to install zsh? (y/n): " zsh_response
 if [ "$zsh_response" == "y" ] || [ "$zsh_response" == "Y" ]; then
   # Download and execute the zsh installation script
-  wget -O install-zsh.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh.sh
+  wget -O install-zsh.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh-sudo.sh
   sudo chmod +x install-zsh.sh
-  sudo ./install-zsh.sh
+  sudo ./install_zsh_root_safe.sh "$CURRENT_USER"
   echo "Zsh installed. You may want to reboot to switch shell."
 fi
 
