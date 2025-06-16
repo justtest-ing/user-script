@@ -59,7 +59,7 @@ if [ "$zsh_response" == "y" ] || [ "$zsh_response" == "Y" ]; then
   # Download and execute the zsh installation script
   wget -O install-zsh.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh-sudo.sh
   sudo chmod +x install-zsh.sh
-  sudo ./install_zsh_root_safe.sh "$CURRENT_USER"
+  sudo ./install-zsh-sudo.sh "$CURRENT_USER"
   echo "Zsh installed. You may want to reboot to switch shell."
 fi
 
