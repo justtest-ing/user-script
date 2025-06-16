@@ -57,8 +57,8 @@ fi
 read -p "Do you want to install zsh? (y/n): " zsh_response
 if [ "$zsh_response" == "y" ] || [ "$zsh_response" == "Y" ]; then
   # Download and execute the zsh installation script
-  wget -O install-zsh.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh-sudo.sh
-  sudo chmod +x install-zsh.sh
+  wget -O install-zsh-sudo.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-zsh-sudo.sh
+  sudo chmod +x install-zsh-sudo.sh
   sudo ./install-zsh-sudo.sh "$CURRENT_USER"
   echo "Zsh installed. You may want to reboot to switch shell."
 fi
