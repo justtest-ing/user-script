@@ -24,10 +24,28 @@ Menu:
 }
 
 # Function for installing tdu
-
+function install_tdu {
+    wget -O install-tdu.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-tdu.sh
+    sudo chmod +x install-tdu.sh
+    sudo ./install-tdu.sh
+    echo "tdu installed successfully"
+}
 
 # apply log size fix
+function apply_log_size_fix {
+    sudo nano /etc/docker/daemon.json
+    
+    {
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "10m",
+        "max-file": "3"
+    }
+}
 
+
+
+}
 
 # Function for setting timezone
 function set_timezone {
@@ -139,6 +157,6 @@ while true; do
 done
 
 # Clean up downloaded scripts
-sudo rm -f install-docker.sh install-dockge.sh ubuntu_mount_SMB_share.sh install-zsh-sudo.sh >/dev/null 2>&1
+sudo rm -f install-docker.sh install-dockge.sh ubuntu_mount_SMB_share.sh install-zsh-sudo.sh install-tdu.sh >/dev/null 2>&1
 
 echo "Script execution completed."
