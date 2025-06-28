@@ -167,4 +167,5 @@ done
 
 # Clean up downloaded scripts
 sudo rm -f install-docker.sh install-dockge.sh ubuntu_mount_SMB_share.sh install-zsh-sudo.sh install-tdu.sh log-size-reducer.sh >/dev/null 2>&1
+echo ""
 echo "Script execution completed."
