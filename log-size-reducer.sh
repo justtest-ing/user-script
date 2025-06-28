@@ -29,11 +29,18 @@ sudo bash -c "cat > $DOCKER_CONFIG" <<EOF
 }
 EOF
 
+echo ""
 echo "Docker daemon.json updated."
 
-# Restart Docker to apply changes
-echo "Restarting Docker..."
-sudo systemctl restart docker
-echo "Docker restarted."
+# Check if Docker is installed and running before restarting
+if command -v docker >/dev/null 2>&1 && sudo systemctl is-active --quiet docker; then
+    echo ""
+    echo "Restarting Docker..."
+    sudo systemctl restart docker
+    echo "Docker restarted."
+else
+    echo ""
+    echo "Docker not found or not running. Skipping Docker restart."
+fi
 
 echo "===== Log reduction completed ====="
