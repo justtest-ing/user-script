@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Detect the current user (not root)
 CURRENT_USER=$(logname)
 
@@ -18,33 +17,11 @@ Menu:
 3. Install Dockge
 4. Mount SMB Share
 5. Install ZSH
-6. ALL (Run all installations)
-7. Exit
+6. Install tdu (top disk usage)
+7. Apply Log Size Reducer
+8. ALL (Run all installations)
+9. Exit
 "
-}
-
-# Function for installing tdu
-function install_tdu {
-    wget -O install-tdu.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-tdu.sh
-    sudo chmod +x install-tdu.sh
-    sudo ./install-tdu.sh
-    echo "tdu installed successfully"
-}
-
-# apply log size fix
-function apply_log_size_fix {
-    sudo nano /etc/docker/daemon.json
-    
-    {
-    "log-driver": "json-file",
-    "log-opts": {
-        "max-size": "10m",
-        "max-file": "3"
-    }
-}
-
-
-
 }
 
 # Function for setting timezone
@@ -99,10 +76,32 @@ function install_zsh {
     fi
 }
 
+# Function for installing tdu
+function install_tdu {
+    read -p "Do you want to install tdu (top disk usage)? (y/n): " tdu_response
+    if [ "$tdu_response" == "y" ] || [ "$tdu_response" == "Y" ]; then
+        wget -O install-tdu.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-tdu.sh
+        sudo chmod +x install-tdu.sh
+        sudo ./install-tdu.sh
+        echo "tdu installed successfully"
+    fi
+}
+
+# Function for applying log size reducer
+function log_size_fix {
+    read -p "Do you want to apply log size reduction? (y/n): " logreduce_response
+    if [ "$logreduce_response" == "y" ] || [ "$logreduce_response" == "Y" ]; then
+        wget -O log-size-reducer.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/log-size-reducer.sh
+        sudo chmod +x log-size-reducer.sh
+        sudo ./log-size-reducer.sh
+        echo "Log size reduction applied successfully"
+    fi
+}
+
 # Main script execution
 while true; do
     show_menu
-    read -p "Please select an option (1-7) or press q to quit: " choice
+    read -p "Please select an option (1-9) or press q to quit: " choice
     
     case $choice in
         1)
@@ -126,6 +125,14 @@ while true; do
         ;;
         
         6)
+            install_tdu && break
+        ;;
+        
+        7)
+            log_size_fix && break
+        ;;
+        
+        8)
             # Run ALL installations
             echo "Running all installations..."
             
@@ -134,12 +141,14 @@ while true; do
             install_dockge || true
             mount_smb || true
             install_zsh || true
+            install_tdu || true
+            log_size_fix || true
             
             echo "All installations completed."
             break
         ;;
         
-        7)
+        9)
             exit 0
         ;;
         
@@ -157,6 +166,5 @@ while true; do
 done
 
 # Clean up downloaded scripts
-sudo rm -f install-docker.sh install-dockge.sh ubuntu_mount_SMB_share.sh install-zsh-sudo.sh install-tdu.sh >/dev/null 2>&1
-
+sudo rm -f install-docker.sh install-dockge.sh ubuntu_mount_SMB_share.sh install-zsh-sudo.sh install-tdu.sh log-size-reducer.sh >/dev/null 2>&1
 echo "Script execution completed."
