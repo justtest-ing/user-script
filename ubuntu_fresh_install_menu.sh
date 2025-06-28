@@ -23,6 +23,12 @@ Menu:
 "
 }
 
+# Function for installing tdu
+
+
+# apply log size fix
+
+
 # Function for setting timezone
 function set_timezone {
     read -p "Do you want to set the timezone to Asia/Taipei? (y/n): " response
