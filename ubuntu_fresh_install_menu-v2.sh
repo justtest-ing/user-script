@@ -95,7 +95,7 @@ function install_tdu {
 
 # Function for applying log size reducer
 function log_size_fix {
-    read -p "Do you want to apply log size reduction? (y/n): " logreduce_response
+    read -p "Do you want to apply log size reduction fix? (y/n): " logreduce_response
     if [ "$logreduce_response" == "y" ] || [ "$logreduce_response" == "Y" ]; then
         wget -O log-size-reducer.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/log-size-reducer.sh
         sudo chmod +x log-size-reducer.sh
