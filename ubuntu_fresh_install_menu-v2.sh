@@ -4,6 +4,7 @@ CURRENT_USER=$(logname)
 
 # Check if script is being run without sudo
 if [ "$EUID" -ne 0 ]; then
+    echo ""
     echo "This script must be run as root or with sudo privileges."
     exit 1
 fi
@@ -29,8 +30,10 @@ function set_timezone {
     read -p "Do you want to set the timezone to Asia/Taipei? (y/n): " response
     if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
         sudo timedatectl set-timezone Asia/Taipei
+        echo ""
         echo "Timezone set to Asia/Taipei"
     else
+        echo ""
         echo "Skipping timezone change."
     fi
 }
@@ -40,6 +43,7 @@ function install_docker {
     wget -O install-docker.sh https://gitlab.com/bmcgonag/docker_installs/-/raw/main/install_docker_nproxyman.sh
     sudo chmod +x install-docker.sh
     sudo ./install-docker.sh
+    echo ""
     echo "Docker installed successfully"
 }
 
@@ -62,6 +66,7 @@ function mount_smb {
         sudo chmod +x ubuntu_mount_SMB_share.sh
         sudo ./ubuntu_mount_SMB_share.sh
     else
+        echo ""
         echo "Skipping SMB share setup."
     fi
 }
@@ -83,6 +88,7 @@ function install_tdu {
         wget -O install-tdu.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/install-tdu.sh
         sudo chmod +x install-tdu.sh
         sudo ./install-tdu.sh
+        echo ""
         echo "tdu installed successfully"
     fi
 }
@@ -94,6 +100,7 @@ function log_size_fix {
         wget -O log-size-reducer.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/log-size-reducer.sh
         sudo chmod +x log-size-reducer.sh
         sudo ./log-size-reducer.sh
+        echo ""
         echo "Log size reduction applied successfully"
     fi
 }
