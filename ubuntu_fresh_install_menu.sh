@@ -43,6 +43,18 @@ function install_docker {
     wget -O install-docker.sh https://gitlab.com/bmcgonag/docker_installs/-/raw/main/install_docker_nproxyman.sh
     sudo chmod +x install-docker.sh
     sudo ./install-docker.sh
+
+    # Check if Docker is installed and running before fixing permission
+    if command -v docker >/dev/null 2>&1 && sudo systemctl is-active --quiet docker; then
+        echo ""
+        echo "Fixing docker permission."
+        sudo chmod 666 /var/run/docker.sock
+        sudo usermod -aG docker $USER
+    else
+        echo ""
+        echo "Docker not found. Skipping applying permission fix."
+    fi
+
     echo ""
     echo "Docker installed successfully"
 }
