@@ -1,17 +1,22 @@
 #!/bin/bash
 set -e
 
+# === Set general variables ===
+SHARE_TYPE="cifs"
+REMOTE_HOST="192.168.1.100"
+REMOTE_PATH="//192.168.1.100/share"
+MOUNT_NAME="shared-data"
+
+HOST_MOUNT="/mnt/remote/${MOUNT_NAME}"
+LXC_MOUNT="/mnt/remote/${MOUNT_NAME}"
+
+CREDENTIALS_FILE="/root/.smbcredentials"
+
 # === Helper: Confirm prompt ===
 confirm() {
   read -p "❓ Proceed? (y/N): " CONFIRM
   [[ "$CONFIRM" =~ ^[Yy]$ ]]
 }
-
-# === Check for uninstall flag ===
-if [[ "$1" == "--uninstall" ]]; then
-  uninstall_mount
-  exit 0
-fi
 
 # === Helper: Remove mount entry ===
 uninstall_mount() {
@@ -39,16 +44,28 @@ uninstall_mount() {
       echo "✅ Selected: $ENTRY"
       sed -i "\|$ENTRY|d" "$CONF_FILE"
 
-      # Remove mount from /etc/fstab
+      # Extract host path
       HOST_PATH=$(echo "$ENTRY" | cut -d',' -f1 | cut -d':' -f2)
-      echo "🧹 Cleaning up fstab..."
-      sed -i "\|$HOST_PATH|d" /etc/fstab
 
-      echo "🧹 Optionally remove the host folder $HOST_PATH"
-      read -p "Delete host folder $HOST_PATH? (y/N): " DELFOLDER
-      if [[ "$DELFOLDER" =~ ^[Yy]$ ]]; then
-        rm -rf "$HOST_PATH"
-        echo "🗑 Removed folder: $HOST_PATH"
+      echo ""
+      read -p "❓ Remove host mount for $HOST_PATH as well? (y/N): " REMOVE_HOST
+      if [[ "$REMOVE_HOST" =~ ^[Yy]$ ]]; then
+        echo "🧹 Removing from /etc/fstab..."
+        sed -i "\|$HOST_PATH|d" /etc/fstab
+
+        echo "🔌 Attempting to unmount $HOST_PATH..."
+        if mountpoint -q "$HOST_PATH"; then
+          umount "$HOST_PATH" && echo "✅ Unmounted $HOST_PATH"
+        else
+          echo "ℹ️ $HOST_PATH is not mounted"
+        fi
+
+        echo ""
+        read -p "🗑 Delete host folder $HOST_PATH? (y/N): " DELFOLDER
+        if [[ "$DELFOLDER" =~ ^[Yy]$ ]]; then
+          rm -rf "$HOST_PATH"
+          echo "🗑 Removed folder: $HOST_PATH"
+        fi
       fi
 
       echo "🔁 Restarting container $VMID..."
@@ -62,6 +79,12 @@ uninstall_mount() {
   done
 }
 
+# === Check for uninstall flag ===
+if [[ "$1" == "--uninstall" ]]; then
+  uninstall_mount
+  exit 0
+fi
+
 # === Ask for container ID ===
 read -p "🔢 Enter the LXC container VMID: " VMID
 
@@ -70,17 +93,6 @@ if ! pct config "$VMID" &>/dev/null; then
   echo "❌ Container with VMID $VMID does not exist."
   exit 1
 fi
-
-# === Set general variables ===
-SHARE_TYPE="cifs"
-REMOTE_HOST="192.168.1.100"
-REMOTE_PATH="//192.168.1.100/share"
-MOUNT_NAME="shared-data"
-
-HOST_MOUNT="/mnt/remote/${MOUNT_NAME}"
-LXC_MOUNT="/mnt/remote/${MOUNT_NAME}"
-
-CREDENTIALS_FILE="/root/.smbcredentials"
 
 # === Show planned actions ===
 echo ""
@@ -138,38 +150,60 @@ fi
 echo "📁 Creating host mount folder..."
 mkdir -p "$HOST_MOUNT"
 
-echo "🔗 Mounting remote share..."
-if [ "$SHARE_TYPE" = "nfs" ]; then
-  apt install -y nfs-common
-  mount -t nfs "${REMOTE_HOST}:${REMOTE_PATH}" "$HOST_MOUNT"
-  FSTAB_ENTRY="${REMOTE_HOST}:${REMOTE_PATH} ${HOST_MOUNT} nfs defaults 0 0"
-elif [ "$SHARE_TYPE" = "cifs" ]; then
-  apt install -y cifs-utils
-  mount -t cifs "$REMOTE_PATH" "$HOST_MOUNT" \
-    -o credentials=$CREDENTIALS_FILE,uid=$MAPPED_UID,gid=$MAPPED_GID,iocharset=utf8
-  FSTAB_ENTRY="${REMOTE_PATH} ${HOST_MOUNT} cifs credentials=${CREDENTIALS_FILE},uid=${MAPPED_UID},gid=${MAPPED_GID},iocharset=utf8 0 0"
-else
-  echo "❌ Unknown share type: $SHARE_TYPE"
-  exit 1
+goto_add_fstab_and_lxc=0
+
+# === Check if already mounted ===
+if mountpoint -q "$HOST_MOUNT"; then
+  echo "⚠️ Mount point $HOST_MOUNT is already mounted."
+  read -p "❓ Do you want to skip remounting? (Y/n): " SKIPMOUNT
+  if [[ ! "$SKIPMOUNT" =~ ^[Nn]$ ]]; then
+    echo "✅ Skipping mount."
+    FSTAB_ENTRY="${REMOTE_PATH} ${HOST_MOUNT} cifs credentials=${CREDENTIALS_FILE},uid=${MAPPED_UID},gid=${MAPPED_GID},iocharset=utf8 0 0"
+    goto_add_fstab_and_lxc=1
+  else
+    echo "🔄 Proceeding with remount..."
+    umount "$HOST_MOUNT" || echo "⚠️ Could not unmount (maybe wasn't mounted cleanly)"
+  fi
+fi
+
+# === Proceed with mount if not skipped ===
+if [[ "$goto_add_fstab_and_lxc" == "0" ]]; then
+  echo "🔗 Mounting remote share..."
+  if [ "$SHARE_TYPE" = "nfs" ]; then
+    apt install -y nfs-common
+    mount -t nfs "${REMOTE_HOST}:${REMOTE_PATH}" "$HOST_MOUNT"
+    FSTAB_ENTRY="${REMOTE_HOST}:${REMOTE_PATH} ${HOST_MOUNT} nfs defaults 0 0"
+  elif [ "$SHARE_TYPE" = "cifs" ]; then
+    apt install -y cifs-utils
+    mount -t cifs "$REMOTE_PATH" "$HOST_MOUNT" \
+      -o credentials=$CREDENTIALS_FILE,uid=$MAPPED_UID,gid=$MAPPED_GID,iocharset=utf8
+    FSTAB_ENTRY="${REMOTE_PATH} ${HOST_MOUNT} cifs credentials=${CREDENTIALS_FILE},uid=${MAPPED_UID},gid=${MAPPED_GID},iocharset=utf8 0 0"
+  else
+    echo "❌ Unknown share type: $SHARE_TYPE"
+    exit 1
+  fi
+  goto_add_fstab_and_lxc=1
 fi
 
 # === Persist mount in fstab ===
-if ! grep -qF "$HOST_MOUNT" /etc/fstab; then
-  echo "$FSTAB_ENTRY" >> /etc/fstab
-  echo "✅ Added to /etc/fstab"
-else
-  echo "ℹ️ fstab already contains entry for $HOST_MOUNT"
-fi
+if [[ "$goto_add_fstab_and_lxc" == "1" ]]; then
+  if ! grep -qF "$HOST_MOUNT" /etc/fstab; then
+    echo "$FSTAB_ENTRY" >> /etc/fstab
+    echo "✅ Added to /etc/fstab"
+  else
+    echo "ℹ️ fstab already contains entry for $HOST_MOUNT"
+  fi
 
-# === Add LXC bind mount ===
-LXC_CONF="/etc/pve/lxc/${VMID}.conf"
-MOUNT_LINE="mp0: ${HOST_MOUNT},mp=${LXC_MOUNT},ro=0"
+  # === Add LXC bind mount ===
+  LXC_CONF="/etc/pve/lxc/${VMID}.conf"
+  MOUNT_LINE="mp0: ${HOST_MOUNT},mp=${LXC_MOUNT},ro=0"
 
-if ! grep -qF "$HOST_MOUNT" "$LXC_CONF"; then
-  echo "$MOUNT_LINE" >> "$LXC_CONF"
-  echo "✅ Added bind mount to container config"
-else
-  echo "ℹ️ LXC config already contains mount for $HOST_MOUNT"
+  if ! grep -qF "$HOST_MOUNT" "$LXC_CONF"; then
+    echo "$MOUNT_LINE" >> "$LXC_CONF"
+    echo "✅ Added bind mount to container config"
+  else
+    echo "ℹ️ LXC config already contains mount for $HOST_MOUNT"
+  fi
 fi
 
 # === Reboot container ===
