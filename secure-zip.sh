@@ -44,9 +44,9 @@ echo "🔐 Creating password-protected archive..."
 
 # Check success
 if [[ $? -eq 0 ]]; then
-  echo "✅ Archive created successfully:"
+  echo "[SUCCESS] Archive created successfully:"
   echo "   $OUTFILE"
 else
-  echo "❌ Failed to create archive."
+  echo "[ERROR] Failed to create archive."
   exit 1
 fi
