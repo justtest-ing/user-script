@@ -31,12 +31,19 @@ if [[ "$PASS" != "$PASS2" ]]; then
   exit 1
 fi
 
+# Determine output path (real user home, even under sudo)
+if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+    user_home=$(eval echo "~$SUDO_USER")
+else
+    user_home="$HOME"
+fi
+
 # Extract directory name (no trailing slash)
 BASENAME=$(basename "$DIR")
 
 # Generate date-based filename
 DATE=$(date +%Y%m%d)
-OUTFILE="$HOME/${DATE}-${BASENAME}.7z"
+OUTFILE="${user_home}/${DATE}-${BASENAME}.7z"
 
 # Compress and encrypt
 echo "🔐 Creating password-protected archive..."
