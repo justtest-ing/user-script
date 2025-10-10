@@ -19,16 +19,16 @@ if [[ ! -d "$DIR" ]]; then
   exit 1
 fi
 
-# Prompt for password (silent)
-read -rsp "Enter password for the archive: " PASS
-echo
-read -rsp "Confirm password: " PASS2
-echo
-
-# Check passwords match
-if [[ "$PASS" != "$PASS2" ]]; then
-  echo "❌ Passwords do not match."
-  exit 1
+# --- Step 2: Prompt user for password (optional, hidden input) ---
+read -rsp "Enter password for archive (leave blank for none): " PASS
+echo ""
+if [ -n "$PASS" ]; then
+    read -rsp "Confirm password: " PASS2
+    echo ""
+    if [ "$PASS" != "$PASS2" ]; then
+        echo "Passwords do not match. Aborting."
+        exit 1
+    fi
 fi
 
 # Determine output path (real user home, even under sudo)
@@ -45,9 +45,16 @@ BASENAME=$(basename "$DIR")
 DATE=$(date +%Y%m%d)
 OUTFILE="${user_home}/${DATE}-${BASENAME}.7z"
 
-# Compress and encrypt
-echo "🔐 Creating password-protected archive..."
-7z a -t7z -mhe=on -p"$PASS" "$OUTFILE" "$DIR" >/dev/null
+# --- Step 5: Compress (with or without password) ---
+echo "Creating archive at: $OUTFILE"
+
+if [ -n "$PASS" ]; then
+    echo "Password protection enabled."
+    7z a -t7z -mhe=on -p"$PASS" "$OUTFILE" "$DIR" >/dev/null
+else
+    echo "No password entered. Creating archive without encryption."
+    7z a -t7z "$OUTFILE" "$DIR" >/dev/null
+fi
 
 # Check success
 if [[ $? -eq 0 ]]; then
