@@ -124,7 +124,7 @@ function mount_smb {
 #         echo "==========================================="
 #         echo ""
 
-#         SCRIPT_URL="https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount-v1-cronjob.sh"
+#         SCRIPT_URL="https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount-v1-(cronjob).sh"
 #         TARGET_DIR="/home/$CURRENT_USER/.script"
 #         TARGET_FILE="$TARGET_DIR/fix-reboot-mount.sh"
 
@@ -162,7 +162,7 @@ function mount_smb {
 function fix_reboot_mount {
     read -p "Do you want to set up reboot mount fix script? (y/n): " smb_response
     if [ "$smb_response" == "y" ] || [ "$smb_response" == "Y" ]; then
-        wget -O fix-reboot-mount.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount-v2-apt.sh
+        wget -O fix-reboot-mount.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount-v3-apt.sh
         sudo chmod +x fix-reboot-mount.sh
         sudo ./fix-reboot-mount.sh
         echo ""
