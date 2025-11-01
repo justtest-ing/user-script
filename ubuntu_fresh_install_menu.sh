@@ -114,50 +114,61 @@ function mount_smb {
     fi
 }
 
-# Function to install and schedule reboot mount fix
+# Function to install and schedule reboot mount fix: v1 with cronjob
+# function fix_reboot_mount {
+#     read -p "Do you want to set up reboot mount fix script? (y/n): " smb_response
+#     if [ "$smb_response" == "y" ] || [ "$smb_response" == "Y" ]; then
+#         echo ""
+#         echo "==========================================="
+#         echo "     🔧 Install Reboot Mount Fix Script"
+#         echo "==========================================="
+#         echo ""
+
+#         SCRIPT_URL="https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount-v1-(cronjob).sh"
+#         TARGET_DIR="/home/$CURRENT_USER/.script"
+#         TARGET_FILE="$TARGET_DIR/fix-reboot-mount.sh"
+
+#         echo "➡️  Creating directory: $TARGET_DIR"
+#         mkdir -p "$TARGET_DIR"
+
+#         echo "➡️  Downloading script from GitHub..."
+#         wget -q -O "$TARGET_FILE" "$SCRIPT_URL"
+
+#         if [ ! -s "$TARGET_FILE" ]; then
+#             echo "❌ Failed to download script. Check your network connection."
+#             return 1
+#         fi
+
+#         echo "➡️  Setting executable permission..."
+#         chmod +x "$TARGET_FILE"
+
+#         echo "➡️  Adding crontab entry to run script at reboot..."
+#         # Remove any previous duplicate entries first
+#         crontab -u "$CURRENT_USER" -l 2>/dev/null | grep -v "fix-reboot-mount.sh" | crontab -u "$CURRENT_USER" -
+#         # Add new entry
+#         (crontab -u "$CURRENT_USER" -l 2>/dev/null; echo "@reboot $TARGET_FILE") | crontab -u "$CURRENT_USER" -
+
+#         echo ""
+#         echo "✅ Reboot mount fix installed successfully!"
+#         echo "   Script location: $TARGET_FILE"
+#         echo "   Crontab entry added for user: $CURRENT_USER"
+#     else
+#         echo ""
+#         echo "Skipping reboot mount fix script setup."
+#     fi
+# }
+
+# Function to install and schedule reboot mount fix: v2 with apt
 function fix_reboot_mount {
     read -p "Do you want to set up reboot mount fix script? (y/n): " smb_response
     if [ "$smb_response" == "y" ] || [ "$smb_response" == "Y" ]; then
+        wget -O fix-reboot-mount.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount-v2-(apt).sh
+        sudo chmod +x fix-reboot-mount.sh
+        sudo ./fix-reboot-mount.sh
         echo ""
-        echo "==========================================="
-        echo "     🔧 Install Reboot Mount Fix Script"
-        echo "==========================================="
-        echo ""
-
-        SCRIPT_URL="https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-reboot-mount.sh"
-        TARGET_DIR="/home/$CURRENT_USER/.script"
-        TARGET_FILE="$TARGET_DIR/fix-reboot-mount.sh"
-
-        echo "➡️  Creating directory: $TARGET_DIR"
-        mkdir -p "$TARGET_DIR"
-
-        echo "➡️  Downloading script from GitHub..."
-        wget -q -O "$TARGET_FILE" "$SCRIPT_URL"
-
-        if [ ! -s "$TARGET_FILE" ]; then
-            echo "❌ Failed to download script. Check your network connection."
-            return 1
-        fi
-
-        echo "➡️  Setting executable permission..."
-        chmod +x "$TARGET_FILE"
-
-        echo "➡️  Adding crontab entry to run script at reboot..."
-        # Remove any previous duplicate entries first
-        crontab -u "$CURRENT_USER" -l 2>/dev/null | grep -v "fix-reboot-mount.sh" | crontab -u "$CURRENT_USER" -
-        # Add new entry
-        (crontab -u "$CURRENT_USER" -l 2>/dev/null; echo "@reboot $TARGET_FILE") | crontab -u "$CURRENT_USER" -
-
-        echo ""
-        echo "✅ Reboot mount fix installed successfully!"
-        echo "   Script location: $TARGET_FILE"
-        echo "   Crontab entry added for user: $CURRENT_USER"
-    else
-        echo ""
-        echo "Skipping reboot mount fix script setup."
+        echo "reboot mount fix installed successfully"
     fi
 }
-
 
 # Function for installing ZSH
 function install_zsh {
@@ -227,7 +238,7 @@ function cleanup_files {
     echo ""
 
     DOWNLOADS=("install-docker.sh" "install-dockge.sh" "ubuntu_mount_SMB_share.sh" \
-               "install-zsh-sudo.sh" "install-tdu.sh" "log-size-reducer.sh")
+               "install-zsh-sudo.sh" "install-tdu.sh" "log-size-reducer.sh" "fix-reboot-mount.sh")
 
     echo "The following temporary files (if any) will be removed:"
     for file in "${DOWNLOADS[@]}"; do
@@ -297,8 +308,4 @@ while true; do
     # If user selects an option (other than ALL or Exit), we break the loop to exit
 done
 
-<<<<<<< HEAD
 echo "Script execution completed."
-=======
-echo "Script execution completed."
->>>>>>> fab48dd76d4817f05f58e18623f24e16d433496d
