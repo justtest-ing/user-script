@@ -297,4 +297,8 @@ while true; do
     # If user selects an option (other than ALL or Exit), we break the loop to exit
 done
 
+<<<<<<< HEAD
 echo "Script execution completed."
+=======
+echo "Script execution completed."
+>>>>>>> fab48dd76d4817f05f58e18623f24e16d433496d
