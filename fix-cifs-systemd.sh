@@ -8,7 +8,7 @@ set -e
 
 LOGFILE="/var/log/fix-cifs.log"
 
-echo "🔧 Setting up automatic CIFS module installer..."
+echo "🔧 Setting up CIFS auto-fix system..."
 
 # === Create fix-cifs.sh script ===
 cat <<'EOF' | sudo tee /usr/local/bin/fix-cifs.sh >/dev/null
@@ -82,11 +82,12 @@ EOF
 sudo chmod +x /usr/local/bin/fix-cifs.sh
 
 # === Create systemd service ===
+echo "⚙️  Creating /etc/systemd/system/fix-cifs.service..."
 cat <<'EOF' | sudo tee /etc/systemd/system/fix-cifs.service >/dev/null
 [Unit]
 Description=Fix CIFS mounts after reboot or kernel update
-After=network-online.target systemd-modules-load.service apt-daily.service apt-daily-upgrade.service
-Wants=network-online.target apt-daily.service apt-daily-upgrade.service
+After=network-online.target systemd-modules-load.service cloud-final.service
+Wants=network-online.target
 
 [Service]
 Type=oneshot
@@ -97,9 +98,23 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOF
 
+# === Optional Enhancement: Add Docker dependency ===
+if systemctl list-unit-files | grep -q '^docker.service'; then
+    echo "🐳 Adding Docker dependency on fix-cifs.service..."
+    sudo mkdir -p /etc/systemd/system/docker.service.d
+    cat <<'EOF' | sudo tee /etc/systemd/system/docker.service.d/depends-on-fix-cifs.conf > /dev/null
+[Unit]
+After=fix-cifs.service
+Wants=fix-cifs.service
+EOF
+    sudo systemctl daemon-reload
+else
+    echo "⚠️  Docker service not found — skipping Docker dependency patch."
+fi
+
 # === Enable the service ===
-sudo systemctl daemon-reload
 sudo systemctl enable fix-cifs.service
 
 echo "✅ CIFS auto-fix setup complete!"
+echo "✅ CIFS mounts will now be auto-repaired after reboot or kernel update."
 echo "🔍 Logs will be written to: $LOGFILE"
