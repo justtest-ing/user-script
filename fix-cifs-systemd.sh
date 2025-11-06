@@ -2,6 +2,7 @@
 # setup-fix-cifs.sh
 # Automate CIFS reliability fix after kernel updates + Docker dependency setup
 # solves CIFS: VFS: CIFS mount error: iocharset utf8 not found after kernel update & reboot
+# Log file: /var/log/fix-cifs.log
 
 set -euo pipefail
 
