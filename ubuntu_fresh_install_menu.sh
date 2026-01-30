@@ -162,7 +162,7 @@ function mount_smb {
 function fix_reboot_mount {
     read -p "Do you want to set up reboot mount fix script? (y/n): " smb_response
     if [ "$smb_response" == "y" ] || [ "$smb_response" == "Y" ]; then
-        wget -O fix-reboot-mount.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-cifs-systemd.sh
+        wget -O fix-reboot-mount.sh https://raw.githubusercontent.com/justtest-ing/user-script/refs/heads/main/fix-cifs-systemd-v3.sh
         sudo chmod +x fix-reboot-mount.sh
         sudo ./fix-reboot-mount.sh
         echo ""
